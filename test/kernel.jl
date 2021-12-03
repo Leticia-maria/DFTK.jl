@@ -30,8 +30,8 @@ function test_kernel(spin_polarization, termtype; test_compute=true)
         δρ = randn(size(ρ0))
         ρ_minus     = ρ0 - ε * δρ
         ρ_plus      = ρ0 + ε * δρ
-        ops_minus = DFTK.ene_ops(term, nothing, nothing; ρ=ρ_minus).ops
-        ops_plus  = DFTK.ene_ops(term, nothing, nothing; ρ=ρ_plus).ops
+        ops_minus = DFTK.ene_ops(term, basis, nothing, nothing; ρ=ρ_minus).ops
+        ops_plus  = DFTK.ene_ops(term, basis, nothing, nothing; ρ=ρ_plus).ops
         δV = zero(ρ0)
 
         for iσ in 1:model.n_spin_components
@@ -40,10 +40,10 @@ function test_kernel(spin_polarization, termtype; test_compute=true)
             δV[:, :, :, iσ] = (ops_plus[ifirst].potential - ops_minus[ifirst].potential) / (2ε)
         end
 
-        δV_apply = DFTK.apply_kernel(term, δρ; ρ=ρ0)
+        δV_apply = DFTK.apply_kernel(term, basis, δρ; ρ=ρ0)
         @test norm(δV - δV_apply) < tol
         if test_compute
-            kernel = DFTK.compute_kernel(term; ρ=ρ0)
+            kernel = DFTK.compute_kernel(term, basis; ρ=ρ0)
             δV_matrix = reshape(kernel * vec(δρ), size(δρ))
             @test norm(δV - δV_matrix) < tol
         end

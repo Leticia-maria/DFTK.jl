@@ -4,30 +4,25 @@ Pseudopotential correction energy. TODO discuss the need for this.
 struct PspCorrection end
 (::PspCorrection)(basis) = TermPspCorrection(basis)
 
-struct TermPspCorrection <: Term
-    basis::PlaneWaveBasis
-    energy::Real  # precomputed energy
+struct TermPspCorrection{T <: Real} <: Term
+    energy::T  # precomputed energy
 end
 function TermPspCorrection(basis::PlaneWaveBasis)
     model = basis.model
     if model.n_dim != 3 && any(attype isa ElementPsp for (attype, _) in model.atoms)
         error("The use of pseudopotentials is only sensible for 3D systems.")
     end
-
-    TermPspCorrection(basis, energy_psp_correction(model))
+    TermPspCorrection(energy_psp_correction(model.lattice, model.atoms))
 end
 
-function ene_ops(term::TermPspCorrection, ψ, occ; kwargs...)
-    ops = [NoopOperator(term.basis, kpoint) for kpoint in term.basis.kpoints]
-    (E=term.energy, ops=ops)
+function ene_ops(term::TermPspCorrection, basis::PlaneWaveBasis, ψ, occ; kwargs...)
+    (E=term.energy, ops=[NoopOperator(basis, kpt) for kpt in basis.kpoints])
 end
 
 """
-    energy_psp_correction(model)
 Compute the correction term for properly modelling the interaction of the pseudopotential
 core with the compensating background charge induced by the `Ewald` term.
 """
-energy_psp_correction(model::Model) = energy_psp_correction(model.lattice, model.atoms)
 function energy_psp_correction(lattice, atoms)
     T = eltype(lattice)
 
