@@ -117,11 +117,10 @@ struct MagneticFieldOperator{T <: Real, AT} <: RealFourierOperator
     Apot::AT  # Apot[α][i,j,k] is the A field in (cartesian) direction α
 end
 @timing_seq "apply MagneticFieldOperator" function apply!(Hψ, op::MagneticFieldOperator, ψ)
-    k = kop.kpoint.coordinate
     # TODO this could probably be better optimized
     for α = 1:3
         iszero(op.Apot[α]) && continue
-        pα = [(op.basis.model.recip_lattice * (G + k))[α] for G in G_vectors(op.kpoint)]
+        pα = [(G + op.kpoint.coordinate_cart)[α] for G in G_vectors_cart(op.kpoint)]
         ∂αψ_fourier = pα .* ψ.fourier
         ∂αψ_real = G_to_r(op.basis, op.kpoint, ∂αψ_fourier)
         Hψ.real .+= op.Apot[α] .* ∂αψ_real

@@ -71,11 +71,11 @@ function test_kernel_collinear_vs_noncollinear(termtype)
 
         ρ0 = guess_density(basis)
         δρ = randn(size(ρ0))
-        δV = DFTK.apply_kernel(term, δρ; ρ=ρ0)
+        δV = DFTK.apply_kernel(term, basis, δρ; ρ=ρ0)
 
         ρ0_col = cat(0.5ρ0, 0.5ρ0, dims=4)
         δρ_col = cat(0.5δρ, 0.5δρ, dims=4)
-        δV_pol = DFTK.apply_kernel(term_col, δρ_col; ρ=ρ0_col)
+        δV_pol = DFTK.apply_kernel(term_col, basis, δρ_col; ρ=ρ0_col)
 
         @test norm(δV_pol[:, :, :, 1] - δV_pol[:, :, :, 2]) < 1e-12
         @test norm(δV - δV_pol[:, :, :, 1:1]) < 1e-11

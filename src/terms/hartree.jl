@@ -58,9 +58,7 @@ function compute_kernel(term::TermHartree, basis::PlaneWaveBasis; kwargs...)
     vc_G = term.poisson_green_coeffs
     # Note that `real` here: if omitted, will result in high-frequency noise of even FFT grids
     K = real(G_to_r_matrix(basis) * Diagonal(vec(vc_G)) * r_to_G_matrix(basis))
-
-    n_spin = term.basis.model.n_spin_components
-    n_spin == 1 ? K : [K K; K K]
+    basis.model.n_spin_components == 1 ? K : [K K; K K]
 end
 
 function apply_kernel(term::TermHartree, basis::PlaneWaveBasis, δρ; kwargs...)
