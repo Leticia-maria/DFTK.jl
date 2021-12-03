@@ -2,7 +2,7 @@ using MPI
 
 # Abstract type for all possible bases that can be used in DFTK. Right now this is just
 # one, but this type helps to resolve method ambiguities while avoiding an uninformative ::Any.
-abstract type Basis end
+abstract type AbstractBasis{T <: Real} end
 
 # There are two kinds of plane-wave basis sets used in DFTK.
 # The k-dependent orbitals are discretized on spherical basis sets {G, 1/2 |k+G|^2 ≤ Ecut}.
@@ -52,7 +52,7 @@ Normalization conventions:
 
 `G_to_r` and `r_to_G` convert between these representations.
 """
-struct PlaneWaveBasis{T <: Real} <: Basis
+struct PlaneWaveBasis{T} <: AbstractBasis{T}
     model::Model{T}
 
     ## Global grid information
@@ -141,7 +141,7 @@ Base.eltype(::PlaneWaveBasis{T}) where {T} = T
         mapping_inv = Dict(ifull => iball for (iball, ifull) in enumerate(mapping))
         for iσ = 1:model.n_spin_components
             push!(kpoints_per_spin[iσ],
-                  Kpoint(model,  iσ, k, model.recip_lattice * k,
+                  Kpoint(model, iσ, k, model.recip_lattice * k,
                          mapping, mapping_inv, Gvecs_k))
         end
     end

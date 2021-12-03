@@ -57,7 +57,7 @@ include("anyonic.jl")
 breaks_symmetries(::Anyonic) = true
 
 # forces computes either nothing or an array forces[el][at][α]
-compute_forces(::Term, ::Basis, ψ, occ; kwargs...) = nothing  # by default, no force
+compute_forces(::Term, ::AbstractBasis, ψ, occ; kwargs...) = nothing  # by default, no force
 
 @doc raw"""
     compute_kernel(basis::PlaneWaveBasis; kwargs...)
@@ -85,7 +85,7 @@ In this case the matrix has effectively 4 blocks
     end
     kernel
 end
-compute_kernel(::Term, ::Basis; kwargs...) = nothing  # By default no kernel
+compute_kernel(::Term, ::AbstractBasis; kwargs...) = nothing  # By default no kernel
 
 
 """
@@ -110,4 +110,4 @@ as a 4D (i,j,k,σ) array.
     end
     δV
 end
-apply_kernel(::Term, ::Basis, δρ; kwargs...) = nothing  # by default, no kernel
+apply_kernel(::Term, ::AbstractBasis, δρ; kwargs...) = nothing  # by default, no kernel
