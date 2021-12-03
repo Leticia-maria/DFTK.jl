@@ -46,6 +46,7 @@ end
     model  = basis.model
     n_spin = model.n_spin_components
     @assert all(xc.family in (:lda, :gga) for xc in term.functionals)
+    @assert all(xc.n_spin == n_spin for xc in term.functionals)
 
     # Take derivatives of the density if needed.
     max_ρ_derivs = maximum(max_required_derivative, term.functionals)
@@ -247,6 +248,7 @@ function compute_kernel(term::TermXc, basis::PlaneWaveBasis; ρ, kwargs...)
     if !all(xc.family == :lda for xc in term.functionals)
         error("compute_kernel only implemented for LDA")
     end
+    @assert all(xc.n_spin == n_spin for xc in term.functionals)
 
     kernel = evaluate(term.functionals, density; derivatives=2:2).v2rho2
     fac = term.scaling_factor
@@ -269,6 +271,7 @@ function apply_kernel(term::TermXc, basis::PlaneWaveBasis{T}, δρ; ρ, kwargs..
     n_spin = basis.model.n_spin_components
     isempty(term.functionals) && return nothing
     @assert all(xc.family in (:lda, :gga) for xc in term.functionals)
+    @assert all(xc.n_spin == n_spin for xc in term.functionals)
 
     # Take derivatives of the density and the perturbation if needed.
     max_ρ_derivs = maximum(max_required_derivative, term.functionals)
